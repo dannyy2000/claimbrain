@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const STATS = [
-  { value: "< 10 min", label: "Settlement time" },
+  { value: "< 10 min", label: "Claim settlement once triggered" },
   { value: "Zero",     label: "Humans involved" },
   { value: "100%",     label: "Decisions onchain" },
   { value: "2",        label: "Live policy modules" },
@@ -11,26 +11,32 @@ const FLOW = [
   {
     step: "01",
     agent: null,
-    title: "You buy a policy",
-    body:  "Pay a premium. Your coverage is registered onchain. You do nothing else — no forms, no approvals, no waiting.",
+    title: "You buy a policy — pay a small premium",
+    body:  "Pay a small premium (e.g. 0.015 SOMI/month). In return, you are covered for a much larger amount (e.g. 1 SOMI). You do nothing else. You are now covered. The waiting period begins — this can be days, weeks, or months until something happens.",
   },
   {
     step: "02",
-    agent: "JSON API Agent",
-    title: "Agent fetches live data",
-    body:  "A Somnia base agent queries DeFiLlama for TVL data or AviationStack for flight status. Multiple validators reach consensus on the response. No single source of truth.",
+    agent: null,
+    title: "A covered event happens",
+    body:  "A protocol you are covered on gets exploited. Or your flight gets delayed. The event is already public — the data exists onchain or in public APIs. This is when the 10-minute clock starts.",
   },
   {
     step: "03",
-    agent: "LLM Inference Agent",
-    title: "Agent reasons over your policy rules",
-    body:  "The LLM calls the Policy Brain contract mid-reasoning — not as a string prompt, but as live onchain tools. It checks your rules, your fraud history, your tier. It thinks step by step. It logs every thought onchain.",
+    agent: "JSON API Agent",
+    title: "Agent 1 fetches and verifies the evidence",
+    body:  "A Somnia base agent queries DeFiLlama for live TVL data or AviationStack for flight status. Multiple Somnia validators independently verify the response. Takes ~1-2 minutes.",
   },
   {
     step: "04",
+    agent: "LLM Inference Agent",
+    title: "Agent 2 reasons over your policy rules",
+    body:  "The LLM calls your Policy Brain contract live as an onchain tool — not a static string. It reads your rules, checks your fraud history, checks your customer tier. It reasons step by step and logs every thought permanently onchain. Takes ~3-5 minutes.",
+  },
+  {
+    step: "05",
     agent: null,
-    title: "Decision executes. Money moves.",
-    body:  "APPROVE, REJECT, or FLAG_FRAUD — the contract executes instantly. If approved, funds hit your wallet. The full reasoning trail is permanently readable by anyone.",
+    title: "Decision executes. Your money moves.",
+    body:  "APPROVE → pool sends payout to your wallet instantly. REJECT → claim closed, reason logged onchain. FLAG_FRAUD → held for review. Total time from event to payout: under 10 minutes. Nexus Mutual takes 2-3 days.",
   },
 ];
 
@@ -135,8 +141,9 @@ export default function Home() {
         </h1>
 
         <p className="text-slate-400 text-lg leading-relaxed max-w-xl mx-auto">
-          CLAIMBRAIN chains two AI agents onchain to reason over your policy rules,
-          verify evidence, and pay you out — in under 10 minutes, with no humans involved.
+          Pay a small premium. Get covered for a large amount. When the event happens —
+          exploit, flight delay — two AI agents verify the evidence and settle your claim
+          onchain in under 10 minutes. No forms. No committee. No humans.
         </p>
 
         <div className="flex items-center justify-center gap-3 flex-wrap">
