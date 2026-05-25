@@ -138,11 +138,11 @@ contract ClaimBrain {
         messages[0] = "You are an autonomous insurance claims settlement agent running on the Somnia blockchain. "
                       "You have access to onchain tools to query policy rules, fraud history, and customer tier. "
                       "Use them. Reason step by step using chain-of-thought. "
-                      "Your final answer MUST be exactly one of: APPROVE, REJECT, FLAG_FRAUD — nothing else.";
+                      "Your final answer MUST be exactly one of: APPROVE, REJECT, FLAG_FRAUD - nothing else.";
 
         roles[1]    = "user";
         messages[1] = string(abi.encodePacked(
-            "Claim details — ",
+            "Claim details: ",
             "Protocol or flight: ", ctx.protocolOrFlight, ". ",
             "Live data from oracle: ", apiData, ". ",
             "Claimant address: ", _addressToString(ctx.claimant), ". ",
