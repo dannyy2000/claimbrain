@@ -30,7 +30,7 @@ function DecisionBadge({ decision }: { decision: string }) {
 }
 
 export default function Claims() {
-  const { address, connect, provider } = useWallet();
+  const { address, connect } = useWallet();
 
   const [claims, setClaims]     = useState<ClaimRecord[]>([]);
   const [loading, setLoading]   = useState(false);
@@ -40,61 +40,70 @@ export default function Claims() {
   useEffect(() => {
     if (!address) return;
     if (!ADDRESSES.CLAIM_REGISTRY) {
-      setError("Contract not deployed yet.");
+      setError("Contracts not deployed yet.");
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    const rpc      = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0]);
-    const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, rpc);
+    const provider = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0]);
+    const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, provider);
 
     registry.getClaimsByClaimant(address)
-      .then((records: ClaimRecord[]) => {
-        setClaims([...records].reverse());
-      })
+      .then((records: ClaimRecord[]) => setClaims([...records].reverse()))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [address]);
 
-  const toggle = (id: string) => {
+  const toggle = (id: string) =>
     setExpanded(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
-  };
 
   if (!address) return (
-    <div className="card text-center py-16 space-y-4">
-      <p className="text-slate-400">Connect your wallet to view your claims.</p>
-      <button onClick={connect} className="btn-primary">Connect Wallet</button>
-    </div>
-  );
-
-  if (loading) return (
-    <div className="flex items-center justify-center h-64 text-slate-500">
-      Loading your claims...
-    </div>
-  );
-
-  if (error) return (
-    <div className="card border-red-800/50">
-      <p className="text-red-400 text-sm">{error}</p>
+    <div className="max-w-md mx-auto card text-center py-16 space-y-5 mt-10">
+      <div className="w-12 h-12 rounded-2xl bg-[#1E1E3A] flex items-center justify-center mx-auto text-xl">◉</div>
+      <div className="space-y-1">
+        <p className="text-white font-semibold text-sm">Connect your wallet</p>
+        <p className="text-slate-600 text-xs">to view your claim history and reasoning trails.</p>
+      </div>
+      <button onClick={connect} className="btn-primary text-sm py-2.5 px-6">
+        Connect Wallet
+      </button>
     </div>
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Your Claims</h1>
-        <p className="text-slate-400 text-sm mt-1 font-mono">{address}</p>
+    <div className="space-y-8 pb-20">
+
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold text-white">My Claims</h1>
+        <p className="text-slate-500 text-xs font-mono">{address}</p>
       </div>
 
-      {claims.length === 0 && (
-        <div className="card text-slate-500 text-sm text-center py-16">
-          No claims yet. Buy a policy and trigger a claim to see it here.
+      {error && (
+        <div className="card border-red-500/20 bg-red-500/5">
+          <p className="text-red-400 text-xs">{error}</p>
+        </div>
+      )}
+
+      {loading && (
+        <div className="flex items-center gap-3 text-slate-600 text-xs py-8">
+          <div className="w-4 h-4 border-2 border-[#7B3FE4] border-t-transparent rounded-full animate-spin" />
+          Loading your claims...
+        </div>
+      )}
+
+      {!loading && !error && claims.length === 0 && (
+        <div className="card text-center py-16 space-y-4">
+          <p className="text-slate-500 text-sm">No claims on this wallet yet.</p>
+          <a href="/buy" className="inline-block text-[#7B3FE4] text-xs hover:underline underline-offset-2">
+            Buy a policy and trigger a claim →
+          </a>
         </div>
       )}
 
@@ -105,20 +114,20 @@ export default function Claims() {
           const ts  = new Date(Number(c.timestamp) * 1000).toLocaleString();
 
           return (
-            <div key={id} className="card">
+            <div key={id} className="card space-y-4">
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-3">
-                    <span className="text-slate-500 text-xs">Claim #{id}</span>
-                    <span className="text-xs text-slate-400 border border-[#2A2A4A] rounded px-2 py-0.5">
+                <div className="space-y-2">
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span className="text-slate-700 text-xs font-mono">#{id}</span>
+                    <span className="tag">
                       {POLICY_LABELS[c.policyId.toString()] ?? `Policy ${c.policyId}`}
                     </span>
                     <DecisionBadge decision={c.decision} />
                   </div>
-                  <p className="text-[11px] text-slate-600">{ts}</p>
+                  <p className="text-[11px] text-slate-700">{ts}</p>
                 </div>
 
-                <div className="text-right shrink-0">
+                <div className="text-right shrink-0 space-y-1.5">
                   {c.payoutAmount > 0n && (
                     <p className="text-green-400 font-bold text-sm">
                       +{ethers.formatEther(c.payoutAmount)} SOMI
@@ -126,15 +135,15 @@ export default function Claims() {
                   )}
                   <button
                     onClick={() => toggle(id)}
-                    className="text-[#7B3FE4] text-xs mt-2 hover:underline"
+                    className="block text-[#7B3FE4] text-xs hover:underline underline-offset-2"
                   >
-                    {exp ? "Hide" : "View reasoning"}
+                    {exp ? "Hide reasoning" : "View reasoning →"}
                   </button>
                 </div>
               </div>
 
               {exp && (
-                <div className="mt-4 border-t border-[#2A2A4A] pt-4">
+                <div className="border-t border-[#1E1E3A] pt-4">
                   <ReasoningTrail reasoning={c.reasoning} decision={c.decision} />
                 </div>
               )}

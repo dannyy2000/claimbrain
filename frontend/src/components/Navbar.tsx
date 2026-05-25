@@ -2,9 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useWallet } from "../hooks/useWallet";
 
 const NAV = [
-  { label: "Home",       path: "/" },
   { label: "Buy Policy", path: "/buy" },
-  { label: "Claims",     path: "/claims" },
+  { label: "My Claims",  path: "/claims" },
   { label: "Agent Log",  path: "/agent-log" },
 ];
 
@@ -12,24 +11,33 @@ export default function Navbar() {
   const { address, connect, connecting } = useWallet();
   const { pathname } = useLocation();
 
-  const short = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : null;
+  const short = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    : null;
 
   return (
-    <nav className="border-b border-[#2A2A4A] bg-[#0D0D1A]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="text-[#7B3FE4] font-bold text-lg tracking-tight">
-          CLAIMBRAIN
+    <nav className="border-b border-[#1E1E3A] bg-[#080810]/90 backdrop-blur-md sticky top-0 z-50">
+      <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-md bg-[#7B3FE4] flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">CB</span>
+          </div>
+          <span className="text-white font-bold text-sm tracking-tight">CLAIMBRAIN</span>
+          <span className="text-[10px] text-slate-600 border border-[#1E1E3A] px-2 py-0.5 rounded-full hidden sm:block">
+            Somnia Agentic L1
+          </span>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1">
           {NAV.map(n => (
             <Link
               key={n.path}
               to={n.path}
-              className={`text-sm transition-colors ${
+              className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
                 pathname === n.path
-                  ? "text-[#7B3FE4]"
-                  : "text-slate-400 hover:text-white"
+                  ? "text-white bg-[#1E1E3A]"
+                  : "text-slate-500 hover:text-slate-300"
               }`}
             >
               {n.label}
@@ -40,9 +48,13 @@ export default function Navbar() {
         <button
           onClick={connect}
           disabled={connecting}
-          className="btn-primary text-sm py-2 px-4"
+          className={`text-xs font-medium px-4 py-2 rounded-lg transition-all ${
+            short
+              ? "bg-[#1E1E3A] text-slate-300 border border-[#2E2E4A]"
+              : "bg-[#7B3FE4] text-white hover:bg-[#6B2FD4]"
+          }`}
         >
-          {connecting ? "Connecting..." : short ? short : "Connect Wallet"}
+          {connecting ? "Connecting..." : short ?? "Connect Wallet"}
         </button>
       </div>
     </nav>
