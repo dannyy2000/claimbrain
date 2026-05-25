@@ -269,14 +269,14 @@ Testnet:  0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776
 
 **Agent 1 — JSON API Request**
 ```
-ID:       131742929741608977713
+ID:       13174292974160097713
 Used for: Fetching live TVL from DeFiLlama, flight status from AviationStack
 Method:   fetchString(url, dotNotationSelector) → string
 ```
 
 **Agent 2 — LLM Inference**
 ```
-ID:       128472938475618029384
+ID:       12847293847561029384
 Used for: Reasoning over Policy Brain rules, fraud detection, decision making
 Method:   inferToolsChat(roles, messages, mcpUrls, onchainTools, maxIterations, chainOfThought)
 Key args: onchainTools = [getRules, getFraudHistory, getCustomerTier]

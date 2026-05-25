@@ -11,9 +11,9 @@ ClaimBrain.sol  (orchestrator)
         ↓ createRequest()
 Somnia Platform Contract  (0x5E520... mainnet / 0x037Bb... testnet)
         ↓
-Base Agent 1: JSON API Request  (ID: 131742929741608977713)
+Base Agent 1: JSON API Request  (ID: 13174292974160097713)
         ↓ handleTVLData() callback
-Base Agent 2: LLM Inference     (ID: 128472938475618029384)
+Base Agent 2: LLM Inference     (ID: 12847293847561029384)
         ↓ handleDecision() callback
 InsurancePool.sol  (executes payout)
 ClaimRegistry.sol  (logs reasoning trail)
@@ -116,7 +116,7 @@ bytes memory payload = abi.encodeWithSelector(
     "currentChainTvls.Ethereum"
 );
 platform.createRequest{value: deposit}(
-    JSON_API_AGENT_ID,           // 131742929741608977713
+    JSON_API_AGENT_ID,           // 13174292974160097713
     address(this),
     this.handleTVLData.selector,
     payload
@@ -180,7 +180,7 @@ bytes memory llmPayload = abi.encodeWithSelector(
 );
 
 platform.createRequest{value: address(this).balance}(
-    LLM_INFERENCE_AGENT_ID,      // 128472938475618029384
+    LLM_INFERENCE_AGENT_ID,      // 12847293847561029384
     address(this),
     this.handleDecision.selector,
     llmPayload
