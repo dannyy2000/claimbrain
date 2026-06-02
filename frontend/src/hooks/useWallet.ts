@@ -3,12 +3,12 @@ import { ethers } from "ethers";
 import { SOMNIA_TESTNET } from "../lib/contracts";
 
 interface WalletState {
-  address:  string | null;
-  provider: ethers.BrowserProvider | null;
-  signer:   ethers.JsonRpcSigner | null;
-  chainId:  bigint | null;
+  address:    string | null;
+  provider:   ethers.BrowserProvider | null;
+  signer:     ethers.JsonRpcSigner | null;
+  chainId:    bigint | null;
   connecting: boolean;
-  error:    string | null;
+  error:      string | null;
 }
 
 export function useWallet() {
@@ -31,7 +31,7 @@ export function useWallet() {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
 
-      const network = await provider.getNetwork();
+      const network       = await provider.getNetwork();
       const targetChainId = BigInt(parseInt(SOMNIA_TESTNET.chainId, 16));
 
       if (network.chainId !== targetChainId) {
@@ -59,20 +59,23 @@ export function useWallet() {
     }
   }, []);
 
-  // Reconnect if already authorised
   useEffect(() => {
-    if (!window.ethereum) return;
-    window.ethereum.request({ method: "eth_accounts" }).then((accounts: string[]) => {
-      if (accounts.length > 0) connect();
+    const eth = window.ethereum;
+    if (!eth) return;
+
+    eth.request({ method: "eth_accounts" }).then((accounts) => {
+      if ((accounts as string[]).length > 0) connect();
     });
 
     const onAccountsChanged = () => connect();
     const onChainChanged    = () => window.location.reload();
-    window.ethereum.on("accountsChanged", onAccountsChanged);
-    window.ethereum.on("chainChanged", onChainChanged);
+
+    eth.on("accountsChanged", onAccountsChanged);
+    eth.on("chainChanged",    onChainChanged);
+
     return () => {
-      window.ethereum.removeListener("accountsChanged", onAccountsChanged);
-      window.ethereum.removeListener("chainChanged", onChainChanged);
+      eth.removeListener("accountsChanged", onAccountsChanged);
+      eth.removeListener("chainChanged",    onChainChanged);
     };
   }, [connect]);
 

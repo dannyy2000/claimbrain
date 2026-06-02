@@ -175,7 +175,7 @@ contract ClaimBrain {
         allowedValues[2] = "FLAG_FRAUD";
 
         bytes memory llmPayload = abi.encodeWithSignature(
-            "inferToolsChat(string[],string[],string[],tuple(string,string)[],uint256,bool,string[])",
+            "inferToolsChat(string[],string[],string[],(string,string)[],uint256,bool,string[])",
             roles,
             messages,
             new string[](0),    // no MCP servers

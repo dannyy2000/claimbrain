@@ -68,13 +68,35 @@ async function main() {
   await (await flightModule.seedRules()).wait();
   console.log(`FlightDelayModule:  ${await flightModule.getAddress()} (seeded)\n`);
 
-  // 8. Print .env values
+  // 8. Set premiums for both policy modules
+  console.log("Setting premiums...");
+  // DeFi Hack: 0.015 SOMI/month premium
+  await (await insurancePool.setPremium(1n, ethers.parseEther("0.015"))).wait();
+  // Flight Delay: 0.005 SOMI premium per flight
+  await (await insurancePool.setPremium(2n, ethers.parseEther("0.005"))).wait();
+  console.log("Premiums set.\n");
+
+  // 9. Fund both pools with initial capital so policies can be bought immediately
+  console.log("Funding insurance pools...");
+  // DeFi Hack pool: 10 SOMI initial liquidity
+  await (await insurancePool.fundPool(1n, { value: ethers.parseEther("10") })).wait();
+  // Flight Delay pool: 5 SOMI initial liquidity
+  await (await insurancePool.fundPool(2n, { value: ethers.parseEther("5") })).wait();
+  console.log("Pools funded.\n");
+
+  // 10. Print .env values
   console.log("--- Copy these into your .env ---");
   console.log(`POLICY_BRAIN_ADDRESS=${await policyBrain.getAddress()}`);
   console.log(`CLAIM_REGISTRY_ADDRESS=${await claimRegistry.getAddress()}`);
   console.log(`INSURANCE_POOL_ADDRESS=${await insurancePool.getAddress()}`);
   console.log(`CLAIM_BRAIN_ADDRESS=${await claimBrain.getAddress()}`);
   console.log("---------------------------------");
+  console.log("\n--- Copy these into your frontend/.env ---");
+  console.log(`VITE_POLICY_BRAIN_ADDRESS=${await policyBrain.getAddress()}`);
+  console.log(`VITE_CLAIM_REGISTRY_ADDRESS=${await claimRegistry.getAddress()}`);
+  console.log(`VITE_INSURANCE_POOL_ADDRESS=${await insurancePool.getAddress()}`);
+  console.log(`VITE_CLAIM_BRAIN_ADDRESS=${await claimBrain.getAddress()}`);
+  console.log("------------------------------------------");
 }
 
 main().catch((err) => {
