@@ -68,7 +68,13 @@ async function main() {
   await (await flightModule.seedRules()).wait();
   console.log(`FlightDelayModule:  ${await flightModule.getAddress()} (seeded)\n`);
 
-  // 8. Set premiums for both policy modules
+  // 8. Deploy MonitoringContract — keeper bot calls this to auto-trigger claims
+  const MonitoringContract = await ethers.getContractFactory("MonitoringContract");
+  const monitoring = await MonitoringContract.deploy(await claimBrain.getAddress());
+  await monitoring.waitForDeployment();
+  console.log(`MonitoringContract: ${await monitoring.getAddress()}`);
+
+  // 9. Set premiums for both policy modules
   console.log("Setting premiums...");
   // DeFi Hack: 0.015 SOMI/month premium
   await (await insurancePool.setPremium(1n, ethers.parseEther("0.015"))).wait();
@@ -90,12 +96,14 @@ async function main() {
   console.log(`CLAIM_REGISTRY_ADDRESS=${await claimRegistry.getAddress()}`);
   console.log(`INSURANCE_POOL_ADDRESS=${await insurancePool.getAddress()}`);
   console.log(`CLAIM_BRAIN_ADDRESS=${await claimBrain.getAddress()}`);
+  console.log(`MONITORING_CONTRACT_ADDRESS=${await monitoring.getAddress()}`);
   console.log("---------------------------------");
   console.log("\n--- Copy these into your frontend/.env ---");
   console.log(`VITE_POLICY_BRAIN_ADDRESS=${await policyBrain.getAddress()}`);
   console.log(`VITE_CLAIM_REGISTRY_ADDRESS=${await claimRegistry.getAddress()}`);
   console.log(`VITE_INSURANCE_POOL_ADDRESS=${await insurancePool.getAddress()}`);
   console.log(`VITE_CLAIM_BRAIN_ADDRESS=${await claimBrain.getAddress()}`);
+  console.log(`VITE_MONITORING_CONTRACT_ADDRESS=${await monitoring.getAddress()}`);
   console.log("------------------------------------------");
 }
 
