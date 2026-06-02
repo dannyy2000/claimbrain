@@ -407,18 +407,30 @@ INSURANCE_POOL_ADDRESS=
 CLAIM_REGISTRY_ADDRESS=
 ```
 
-### Deploy Contracts
+### Deployed Contracts — Somnia Testnet (Shannon)
+
+| Contract | Address |
+|---|---|
+| PolicyBrain | `0xaaaa68eE2cBbDf9Eb6492030A230a14e9cbC31c2` |
+| ClaimRegistry | `0x7Bf8D0c64b28bFf00c3301BbDbe28372f5fF61B7` |
+| InsurancePool | `0xC763184E3237DAb892d4bBc48C12C483B735525f` |
+| ClaimBrain | `0x7E03b2B177faECAd1557595b43409D44B0e137A0` |
+
+Explorer: [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)
+
+### Deploy Contracts (fresh deploy)
 
 ```bash
 cd contracts
-npm run deploy --network somnia-testnet   # testnet first
-npm run deploy --network somnia            # then mainnet
+npm run deploy:testnet   # Somnia testnet
+npm run deploy:mainnet   # Somnia mainnet
 ```
 
 ### Run the Frontend
 
 ```bash
 cd frontend
+cp .env.example .env     # fill in contract addresses + API keys
 npm run dev
 ```
 
