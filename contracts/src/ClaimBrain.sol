@@ -60,6 +60,24 @@ contract ClaimBrain {
     receive() external payable {}
 
     // -------------------------------------------------------------------------
+    // onchainTools proxies
+    // Somnia's LLM agent calls these back on THIS contract's address.
+    // We forward each call to PolicyBrain so the agent gets live onchain data.
+    // -------------------------------------------------------------------------
+
+    function getRules(uint256 policyId) external view returns (Rule[] memory) {
+        return policyBrain.getRules(policyId);
+    }
+
+    function getFraudHistory(address claimant) external view returns (uint256 claimsThisYear, bool hasFraudFlag) {
+        return policyBrain.getFraudHistory(claimant);
+    }
+
+    function getCustomerTier(address claimant) external view returns (string memory tier) {
+        return policyBrain.getCustomerTier(claimant);
+    }
+
+    // -------------------------------------------------------------------------
     // Step 1 — Initiate claim: fire JSON API Request agent
     // -------------------------------------------------------------------------
 
