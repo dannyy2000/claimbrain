@@ -32,7 +32,7 @@ const POLICIES = {
     description: "Covers mechanical or operational delays of 2h+. The agent checks your flight status via AviationStack, applies your policy rules, and pays before you land.",
     inputLabel:  "Flight code (IATA)",
     placeholder: "e.g. AA123, BA456",
-    apiUrl:      "https://api.aviationstack.com/v1/flights?flight_iata=",
+    apiUrl:      "http://api.aviationstack.com/v1/flights?flight_iata=",
     selector:    "data.0.departure.delay",
     rules: [
       "Delay 2h+ (non-weather) → $100",
