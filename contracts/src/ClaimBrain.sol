@@ -88,7 +88,12 @@ contract ClaimBrain {
         string calldata apiUrl,
         string calldata apiSelector
     ) external payable {
-        require(msg.value > 0, "ClaimBrain: deposit required for agent");
+        // Deposit formula: floor + (floor × subcommittee_size)
+        // Default subcommittee = 3, so each call needs floor × 4 minimum.
+        // We need two agent calls, so require floor × 8 total.
+        uint256 floor   = platform.getRequestDeposit();
+        uint256 perCall = floor * 4;
+        require(msg.value >= perCall * 2, "ClaimBrain: insufficient deposit, need floor*8 minimum");
 
         bytes memory payload = abi.encodeWithSignature(
             "fetchString(string,string)",
@@ -96,7 +101,7 @@ contract ClaimBrain {
             apiSelector
         );
 
-        uint256 requestId = platform.createRequest{value: msg.value / 2}(
+        uint256 requestId = platform.createRequest{value: perCall}(
             JSON_API_AGENT_ID,
             address(this),
             this.handleApiData.selector,
@@ -185,7 +190,8 @@ contract ClaimBrain {
             allowedValues
         );
 
-        uint256 llmRequestId = platform.createRequest{value: address(this).balance}(
+        uint256 perCall2     = platform.getRequestDeposit() * 4;
+        uint256 llmRequestId = platform.createRequest{value: perCall2}(
             LLM_INFERENCE_AGENT_ID,
             address(this),
             this.handleDecision.selector,
