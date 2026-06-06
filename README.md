@@ -411,10 +411,10 @@ CLAIM_REGISTRY_ADDRESS=
 
 | Contract | Address |
 |---|---|
-| PolicyBrain | `0xaaaa68eE2cBbDf9Eb6492030A230a14e9cbC31c2` |
+| PolicyBrain | `0xc0C753baa778B196578a89305816b7F299ad4750` |
 | ClaimRegistry | `0x7Bf8D0c64b28bFf00c3301BbDbe28372f5fF61B7` |
 | InsurancePool | `0xC763184E3237DAb892d4bBc48C12C483B735525f` |
-| ClaimBrain | `0x47D3b2a632C7fa2dB1F38D90C1177A960d18846a` |
+| ClaimBrain | `0x56518BBf797a77d2F72376C082579cf9E0c182E3` |
 | MonitoringContract | `0x3d343209aB055323B83D3E9307baB6dA78040922` |
 
 Explorer: [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)

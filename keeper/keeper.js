@@ -11,7 +11,7 @@ const AVIATIONSTACK_KEY   = process.env.AVIATIONSTACK_API_KEY;
 
 const POLL_INTERVAL_MS    = 5 * 60 * 1000;   // check every 5 minutes
 const TVL_DROP_THRESHOLD  = 0.50;             // trigger if TVL drops 50%+
-const DEPOSIT_PER_HOLDER  = ethers.parseEther("0.01");
+const DEPOSIT_PER_HOLDER  = ethers.parseEther("0.96");  // floor(0.03) * 32 — covers JSON API + LLM + tool loop
 
 // Protocols to watch — add more as policies are sold
 const WATCHED_PROTOCOLS = [

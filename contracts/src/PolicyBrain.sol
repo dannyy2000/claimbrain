@@ -125,6 +125,12 @@ contract PolicyBrain is IPolicyBrain {
         emit TierSet(claimant, tier);
     }
 
+    // Admin reset for testing — clears claim count and fraud flag for an address
+    function resetClaimant(address claimant) external onlyOwner {
+        _claimsThisYear[claimant] = 0;
+        _fraudFlags[claimant]     = false;
+    }
+
     // --- Views ---
 
     function getRulesCount(uint256 policyId) external view returns (uint256) {

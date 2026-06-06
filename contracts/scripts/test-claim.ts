@@ -85,23 +85,25 @@ async function main() {
     console.log(`      Could not read deposit — using fallback: ${ethers.formatEther(depositPerCall)} SOMI`);
   }
 
-  // Formula: floor + (floor × subcommittee_size) per call, default subcommittee = 3
-  // So each call needs floor × 4. Two calls = floor × 8. Add buffer → floor × 10.
-  const perCall      = depositPerCall * 4n;
-  const totalDeposit = perCall * 2n + depositPerCall; // 2 calls + buffer
+  // LLM costs more — send floor × 16 total so LLM gets plenty after JSON API call
+  const totalDeposit = depositPerCall * 32n; // floor*4 API + floor*12 LLM1 + floor*12 reserve for tool loop
 
   // ── Step 4: Initiate claim ─────────────────────────────────────────────────
   console.log("\n[ 4 ] Initiating claim (fires JSON API agent)...");
-  console.log(`      Protocol: aave`);
-  console.log(`      API URL:  https://api.llama.fi/protocol/aave`);
+  // Beanstalk was hacked April 2022 — currentChainTvls.Ethereum = 0
+  // This should trigger APPROVE since TVL dropped 100%
+  // Rich context passed as protocolOrFlight — ClaimBrain embeds it verbatim in the LLM message
+  const claimEvent = "beanstalk DeFi hack | tvl_drop_pct=100 | exploit_confirmed=true | event_type=EXPLOIT | Beanstalk exploited April 2022 via flash loan governance attack, TVL dropped from $182M to $0";
+  console.log(`      Protocol: beanstalk`);
+  console.log(`      API URL:  https://api.llama.fi/protocol/beanstalk`);
   console.log(`      Selector: currentChainTvls.Ethereum`);
   console.log(`      Deposit:  ${ethers.formatEther(totalDeposit)} SOMI`);
 
   const claimTx = await brain.initiateClaim(
     1n,
     deployer.address,
-    "aave",
-    "https://api.llama.fi/protocol/aave",
+    claimEvent,
+    "https://api.llama.fi/protocol/beanstalk",
     "currentChainTvls.Ethereum",
     { value: totalDeposit }
   );
@@ -121,74 +123,50 @@ async function main() {
     console.log(`      Request ID: ${initiatedEvent.args.requestId}`);
   }
 
-  // ── Step 5: Watch for callbacks ───────────────────────────────────────────
-  console.log("\n[ 5 ] Waiting for agent callbacks...");
-  console.log("      Agent 1 (JSON API) processing...");
-  console.log("      This may take 1-3 minutes on testnet.\n");
+  // ── Step 5: Poll for result (Somnia RPC lacks `removed` field — events crash ethers v6)
+  console.log("\n[ 5 ] Waiting for agent callbacks (polling every 10s, max 8 min)...");
+  console.log("      Agent 1 (JSON API) → Agent 2 (LLM Inference) → callback\n");
 
   const claimsBefore = await registry.totalClaims();
+  let settled = false;
+  const POLL_INTERVAL = 10_000;
+  const MAX_POLLS     = 48; // 8 minutes
 
-  await new Promise<void>((resolve) => {
-    const timeout = setTimeout(() => {
-      console.log("\n      Timeout reached — callbacks may still be processing.");
-      console.log("      Check Agent Log on the frontend for results.");
-      resolve();
-    }, 5 * 60 * 1000); // 5 min timeout
+  for (let i = 0; i < MAX_POLLS; i++) {
+    await new Promise(r => setTimeout(r, POLL_INTERVAL));
 
-    brain.on("ApiDataReceived", (requestId: bigint, data: string) => {
-      console.log(`  ✓  Agent 1 callback fired — API data received`);
-      console.log(`      Data: ${data.slice(0, 100)}...`);
-      console.log("      Agent 2 (LLM Inference) now reasoning...");
-    });
+    // Check if request has been cleared from pendingClaims (stage→0 means done)
+    const pending = await brain.pendingClaims(initiatedEvent?.args?.requestId ?? 0n);
+    const stage   = pending[4]; // uint8 stage
 
-    brain.on("DecisionReceived", async (requestId: bigint, decision: string) => {
-      console.log(`\n  ✓  Agent 2 callback fired — Decision: ${decision}`);
+    if (i % 3 === 0) {
+      process.stdout.write(`      [${(i + 1) * 10}s] stage=${stage} `);
+    }
 
-      const claimsAfter = await registry.totalClaims();
-      if (claimsAfter > claimsBefore) {
-        const claim = await registry.getClaim(claimsAfter);
-        console.log("\n" + "=".repeat(60));
-        console.log("REASONING TRAIL (stored permanently onchain):");
-        console.log("=".repeat(60));
-        console.log(claim.reasoning || "(no chain-of-thought returned)");
-        console.log("=".repeat(60));
-        console.log(`\nFINAL DECISION: ${claim.decision}`);
-        if (claim.payoutAmount > 0n) {
-          console.log(`PAYOUT: ${ethers.formatEther(claim.payoutAmount)} SOMI`);
-        }
-      }
+    const claimsAfter = await registry.totalClaims();
+    if (claimsAfter > claimsBefore) {
+      settled = true;
+      const claim = await registry.getClaim(claimsAfter);
+      console.log(`\n\n${"=".repeat(60)}`);
+      console.log("CLAIMBRAIN — SETTLED");
+      console.log("=".repeat(60));
+      console.log(`DECISION:  ${claim[3]}`);
+      console.log(`PAYOUT:    ${ethers.formatEther(claim[5])} SOMI`);
+      console.log(`REQUEST:   ${claim[6]}`);
+      console.log("\nREASONING TRAIL (stored onchain):");
+      console.log(claim[4] || "(no chain-of-thought)");
+      console.log("=".repeat(60));
+      break;
+    }
 
-      clearTimeout(timeout);
-      brain.removeAllListeners();
-      resolve();
-    });
+    if (i === MAX_POLLS - 1) {
+      console.log("\n\n      Timeout — callbacks still pending. Run check-new.ts to poll.");
+    }
+  }
 
-    brain.on("ClaimRejected", async (policyId: bigint, claimant: string) => {
-      console.log(`\n  ✓  Claim REJECTED — agent determined no qualifying event.`);
-      const claimsAfter = await registry.totalClaims();
-      if (claimsAfter > claimsBefore) {
-        const claim = await registry.getClaim(claimsAfter);
-        console.log("\nREASONING TRAIL:");
-        console.log(claim.reasoning || "(no chain-of-thought returned)");
-      }
-      clearTimeout(timeout);
-      brain.removeAllListeners();
-      resolve();
-    });
-
-    brain.on("PayoutTriggered", (policyId: bigint, claimant: string, amount: bigint) => {
-      console.log(`\n  ✓  PAYOUT TRIGGERED: ${ethers.formatEther(amount)} SOMI → ${claimant}`);
-    });
-
-    brain.on("FraudFlagged", () => {
-      console.log(`\n  ✓  FRAUD FLAG raised.`);
-      clearTimeout(timeout);
-      brain.removeAllListeners();
-      resolve();
-    });
-  });
-
-  console.log("\nTest complete. Check the frontend Agent Log for the full reasoning trail.");
+  if (!settled) {
+    console.log("\nTip: run  npx hardhat run scripts/check-new.ts --network somnia-testnet");
+  }
 }
 
 main().catch(err => {
