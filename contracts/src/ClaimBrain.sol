@@ -132,7 +132,7 @@ contract ClaimBrain {
         require(pendingClaims[requestId].stage == 1, "ClaimBrain: unexpected callback");
 
         ClaimContext memory ctx = pendingClaims[requestId];
-        string memory apiData   = (status == ResponseStatus.SUCCESS)
+        string memory apiData   = (status == ResponseStatus.Success && responses.length > 0)
             ? abi.decode(responses[0].result, (string))
             : "UNAVAILABLE";
 
@@ -220,7 +220,7 @@ contract ClaimBrain {
         ClaimContext memory ctx = pendingClaims[requestId];
         delete pendingClaims[requestId];
 
-        if (status != ResponseStatus.SUCCESS || responses.length == 0) {
+        if (status != ResponseStatus.Success || responses.length == 0) {
             // Agent failed — reject claim and log
             claimRegistry.logDecision(ctx.policyId, ctx.claimant, "REJECT", "Agent call failed", 0, requestId);
             emit ClaimRejected(ctx.policyId, ctx.claimant);

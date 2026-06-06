@@ -1,17 +1,44 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-enum ResponseStatus { SUCCESS, ERROR, TIMEOUT }
+// Exact definitions from Somnia docs
+// https://docs.somnia.network/agents/invoking-agents/from-solidity
+
+enum ResponseStatus {
+    None,       // 0
+    Pending,    // 1
+    Success,    // 2
+    Failed,     // 3
+    TimedOut    // 4
+}
+
+enum ConsensusType { Majority, Threshold }
 
 struct Response {
-    bytes result;
+    address         validator;
+    bytes           result;
+    ResponseStatus  status;
+    uint256         receipt;
+    uint256         timestamp;
+    uint256         executionCost;
 }
 
 struct Request {
-    uint256 agentId;
-    address callbackContract;
-    bytes4  callbackSelector;
-    bytes   payload;
+    uint256         id;
+    address         requester;
+    address         callbackAddress;
+    bytes4          callbackSelector;
+    address[]       subcommittee;
+    Response[]      responses;
+    uint256         responseCount;
+    uint256         failureCount;
+    uint256         threshold;
+    uint256         createdAt;
+    uint256         deadline;
+    ResponseStatus  status;
+    ConsensusType   consensusType;
+    uint256         remainingBudget;
+    uint256         perAgentBudget;
 }
 
 struct OnchainTool {
@@ -22,7 +49,7 @@ struct OnchainTool {
 interface IAgentRequester {
     function createRequest(
         uint256        agentId,
-        address        callbackContract,
+        address        callbackAddress,
         bytes4         callbackSelector,
         bytes calldata payload
     ) external payable returns (uint256 requestId);
