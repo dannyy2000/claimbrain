@@ -174,20 +174,15 @@ contract ClaimBrain {
             "Then decide: APPROVE, REJECT, or FLAG_FRAUD."
         ));
 
-        string[] memory allowedValues = new string[](3);
-        allowedValues[0] = "APPROVE";
-        allowedValues[1] = "REJECT";
-        allowedValues[2] = "FLAG_FRAUD";
-
+        // inferToolsChat has no allowedValues param — constraint is via system prompt
         bytes memory llmPayload = abi.encodeWithSignature(
-            "inferToolsChat(string[],string[],string[],(string,string)[],uint256,bool,string[])",
+            "inferToolsChat(string[],string[],string[],(string,string)[],uint256,bool)",
             roles,
             messages,
             new string[](0),    // no MCP servers
             tools,
             uint256(5),         // max 5 tool-call iterations
-            true,               // chainOfThought ON
-            allowedValues
+            true                // chainOfThought ON
         );
 
         uint256 perCall2     = platform.getRequestDeposit() * 4;
@@ -227,8 +222,12 @@ contract ClaimBrain {
             return;
         }
 
-        string memory decision  = abi.decode(responses[0].result, (string));
-        string memory reasoning = responses.length > 1 ? abi.decode(responses[1].result, (string)) : "";
+        // inferToolsChat returns (finishReason, response, updatedRoles, updatedMessages, pendingToolCallIds, pendingToolCalls)
+        (string memory finishReason, string memory decision, , , ,) = abi.decode(
+            responses[0].result,
+            (string, string, string[], string[], string[], bytes[])
+        );
+        string memory reasoning = finishReason;
 
         emit DecisionReceived(requestId, decision);
 
