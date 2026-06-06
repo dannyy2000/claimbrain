@@ -415,6 +415,7 @@ CLAIM_REGISTRY_ADDRESS=
 | ClaimRegistry | `0x7Bf8D0c64b28bFf00c3301BbDbe28372f5fF61B7` |
 | InsurancePool | `0xC763184E3237DAb892d4bBc48C12C483B735525f` |
 | ClaimBrain | `0x7E03b2B177faECAd1557595b43409D44B0e137A0` |
+| MonitoringContract | `0x3d343209aB055323B83D3E9307baB6dA78040922` |
 
 Explorer: [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)
 
