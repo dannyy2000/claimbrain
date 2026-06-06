@@ -174,18 +174,18 @@ contract ClaimBrain {
             "Then decide: APPROVE, REJECT, or FLAG_FRAUD."
         ));
 
-        // Use inferString first to verify LLM agent works, then upgrade to inferToolsChat
-        // inferString(string systemPrompt, string userMessage, string[] allowedValues)
+        // inferString(string prompt, string system, bool chainOfThought, string[] allowedValues)
         string[] memory allowed = new string[](3);
         allowed[0] = "APPROVE";
         allowed[1] = "REJECT";
         allowed[2] = "FLAG_FRAUD";
 
         bytes memory llmPayload = abi.encodeWithSignature(
-            "inferString(string,string,string[])",
-            messages[0],   // system prompt
-            messages[1],   // user message (contains claim context + api data)
-            allowed
+            "inferString(string,string,bool,string[])",
+            messages[1],   // prompt  (user message with claim context)
+            messages[0],   // system  (insurance agent instructions)
+            false,         // chainOfThought off for now — simpler decode
+            allowed        // constrain output to APPROVE | REJECT | FLAG_FRAUD
         );
 
         uint256 perCall2     = platform.getRequestDeposit() * 4;
