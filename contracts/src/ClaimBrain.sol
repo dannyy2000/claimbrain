@@ -174,15 +174,18 @@ contract ClaimBrain {
             "Then decide: APPROVE, REJECT, or FLAG_FRAUD."
         ));
 
-        // inferToolsChat has no allowedValues param — constraint is via system prompt
+        // Use inferString first to verify LLM agent works, then upgrade to inferToolsChat
+        // inferString(string systemPrompt, string userMessage, string[] allowedValues)
+        string[] memory allowed = new string[](3);
+        allowed[0] = "APPROVE";
+        allowed[1] = "REJECT";
+        allowed[2] = "FLAG_FRAUD";
+
         bytes memory llmPayload = abi.encodeWithSignature(
-            "inferToolsChat(string[],string[],string[],(string,string)[],uint256,bool)",
-            roles,
-            messages,
-            new string[](0),    // no MCP servers
-            tools,
-            uint256(5),         // max 5 tool-call iterations
-            true                // chainOfThought ON
+            "inferString(string,string,string[])",
+            messages[0],   // system prompt
+            messages[1],   // user message (contains claim context + api data)
+            allowed
         );
 
         uint256 perCall2     = platform.getRequestDeposit() * 4;
@@ -222,12 +225,9 @@ contract ClaimBrain {
             return;
         }
 
-        // inferToolsChat returns (finishReason, response, updatedRoles, updatedMessages, pendingToolCallIds, pendingToolCalls)
-        (string memory finishReason, string memory decision, , , ,) = abi.decode(
-            responses[0].result,
-            (string, string, string[], string[], string[], bytes[])
-        );
-        string memory reasoning = finishReason;
+        // inferString returns a single constrained string: APPROVE | REJECT | FLAG_FRAUD
+        string memory decision  = abi.decode(responses[0].result, (string));
+        string memory reasoning = decision;
 
         emit DecisionReceived(requestId, decision);
 

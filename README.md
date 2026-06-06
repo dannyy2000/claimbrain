@@ -414,7 +414,7 @@ CLAIM_REGISTRY_ADDRESS=
 | PolicyBrain | `0xaaaa68eE2cBbDf9Eb6492030A230a14e9cbC31c2` |
 | ClaimRegistry | `0x7Bf8D0c64b28bFf00c3301BbDbe28372f5fF61B7` |
 | InsurancePool | `0xC763184E3237DAb892d4bBc48C12C483B735525f` |
-| ClaimBrain | `0xB2f0d5e66D75F1cBf3461bDc9DA306D85bccE0eC` |
+| ClaimBrain | `0xD83AbF9cD14f352CF090551E4b1B122F818B393f` |
 | MonitoringContract | `0x3d343209aB055323B83D3E9307baB6dA78040922` |
 
 Explorer: [shannon-explorer.somnia.network](https://shannon-explorer.somnia.network)
