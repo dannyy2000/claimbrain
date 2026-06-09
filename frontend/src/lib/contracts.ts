@@ -1,10 +1,10 @@
 // Fill these after running: npm run deploy:testnet from contracts/
 export const ADDRESSES = {
-  POLICY_BRAIN:    import.meta.env.VITE_POLICY_BRAIN_ADDRESS         ?? "",
-  CLAIM_REGISTRY:  import.meta.env.VITE_CLAIM_REGISTRY_ADDRESS       ?? "",
-  INSURANCE_POOL:  import.meta.env.VITE_INSURANCE_POOL_ADDRESS       ?? "",
-  CLAIM_BRAIN:     import.meta.env.VITE_CLAIM_BRAIN_ADDRESS          ?? "",
-  MONITORING:      import.meta.env.VITE_MONITORING_CONTRACT_ADDRESS  ?? "",
+  POLICY_BRAIN:    (import.meta.env.VITE_POLICY_BRAIN_ADDRESS        ?? "").trim(),
+  CLAIM_REGISTRY:  (import.meta.env.VITE_CLAIM_REGISTRY_ADDRESS      ?? "").trim(),
+  INSURANCE_POOL:  (import.meta.env.VITE_INSURANCE_POOL_ADDRESS      ?? "").trim(),
+  CLAIM_BRAIN:     (import.meta.env.VITE_CLAIM_BRAIN_ADDRESS         ?? "").trim(),
+  MONITORING:      (import.meta.env.VITE_MONITORING_CONTRACT_ADDRESS ?? "").trim(),
 };
 
 export const SOMNIA_TESTNET = {
