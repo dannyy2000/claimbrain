@@ -58,25 +58,37 @@ export default function AgentLog() {
       return;
     }
 
-    // staticNetwork: true prevents ethers v6 from doing any ENS/network lookups on Somnia
-    const network  = new ethers.Network("somnia-testnet", 50312);
-    const provider = new ethers.JsonRpcProvider(
-      SOMNIA_TESTNET.rpcUrls[0],
-      network,
-      { staticNetwork: network }
-    );
-    const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, provider);
+    // Use raw fetch + Interface instead of ethers Contract to avoid ENS resolution
+    // that ethers v6 triggers on unknown networks when decoding address fields.
+    const iface = new ethers.Interface(CLAIM_REGISTRY_ABI);
+    const rpc   = SOMNIA_TESTNET.rpcUrls[0];
+    const to    = ADDRESSES.CLAIM_REGISTRY;
+
+    async function ethCall(data: string): Promise<string> {
+      const res  = await fetch(rpc, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method: "eth_call", params: [{ to, data }, "latest"] }),
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error.message);
+      return json.result as string;
+    }
 
     let lastTotal = 0n;
 
     async function load() {
       try {
-        const total = await registry.totalClaims() as bigint;
-        if (total === lastTotal && lastTotal > 0n) return;
-        lastTotal = total;
+        const totalHex = await ethCall(iface.encodeFunctionData("totalClaims", []));
+        const [total]  = iface.decodeFunctionResult("totalClaims", totalHex);
+        const totalBig = BigInt(total);
+        if (totalBig === lastTotal && lastTotal > 0n) return;
+        lastTotal = totalBig;
         const all: ClaimRecord[] = [];
-        for (let i = 1n; i <= total; i++) {
-          all.push(await registry.getClaim(i) as ClaimRecord);
+        for (let i = 1n; i <= totalBig; i++) {
+          const hex     = await ethCall(iface.encodeFunctionData("getClaim", [i]));
+          const decoded = iface.decodeFunctionResult("getClaim", hex);
+          all.push(decoded[0] as ClaimRecord);
         }
         setClaims([...all].reverse());
       } catch (err) {
@@ -88,7 +100,6 @@ export default function AgentLog() {
 
     load();
 
-    // Poll every 10s — Somnia RPC doesn't support eth_newFilter reliably
     const interval = setInterval(load, 10_000);
     return () => clearInterval(interval);
   }, []);
