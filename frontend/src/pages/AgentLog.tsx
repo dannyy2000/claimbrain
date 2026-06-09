@@ -58,12 +58,20 @@ export default function AgentLog() {
       return;
     }
 
-    const provider = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0]);
+    // Explicit network avoids ethers treating Somnia as "unknown" and attempting ENS lookups
+    const provider = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0], {
+      chainId: 50312,
+      name: "somnia-testnet",
+    });
     const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, provider);
+
+    let lastTotal = 0n;
 
     async function load() {
       try {
         const total = await registry.totalClaims() as bigint;
+        if (total === lastTotal && lastTotal > 0n) return;
+        lastTotal = total;
         const all: ClaimRecord[] = [];
         for (let i = 1n; i <= total; i++) {
           all.push(await registry.getClaim(i) as ClaimRecord);
@@ -78,9 +86,9 @@ export default function AgentLog() {
 
     load();
 
-    // Real-time: new decisions appear as they land onchain
-    registry.on("DecisionLogged", () => load());
-    return () => { registry.removeAllListeners(); };
+    // Poll every 10s — Somnia RPC doesn't support eth_newFilter reliably
+    const interval = setInterval(load, 10_000);
+    return () => clearInterval(interval);
   }, []);
 
   const toggle = (id: string) =>
@@ -153,7 +161,7 @@ export default function AgentLog() {
                 <div className="text-right shrink-0 space-y-2">
                   {c.payoutAmount > 0n && (
                     <p className="text-green-400 font-bold text-sm">
-                      +{ethers.formatEther(c.payoutAmount)} SOMI
+                      +{ethers.formatEther(c.payoutAmount)} STT
                     </p>
                   )}
                   <div>
