@@ -47,11 +47,26 @@ export default function Claims() {
     setLoading(true);
     setError(null);
 
-    const provider = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0]);
-    const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, provider);
+    const iface = new ethers.Interface(CLAIM_REGISTRY_ABI);
+    const rpc   = SOMNIA_TESTNET.rpcUrls[0];
+    const to    = ADDRESSES.CLAIM_REGISTRY;
 
-    registry.getClaimsByClaimant(address)
-      .then((records: ClaimRecord[]) => setClaims([...records].reverse()))
+    async function ethCall(data: string): Promise<string> {
+      const res  = await fetch(rpc, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }] }),
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error.message);
+      return json.result as string;
+    }
+
+    ethCall(iface.encodeFunctionData("getClaimsByClaimant", [address]))
+      .then(hex => {
+        const [records] = iface.decodeFunctionResult("getClaimsByClaimant", hex);
+        setClaims([...records].reverse());
+      })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [address]);
@@ -130,7 +145,7 @@ export default function Claims() {
                 <div className="text-right shrink-0 space-y-1.5">
                   {c.payoutAmount > 0n && (
                     <p className="text-green-400 font-bold text-sm">
-                      +{ethers.formatEther(c.payoutAmount)} SOMI
+                      +{ethers.formatEther(c.payoutAmount)} STT
                     </p>
                   )}
                   <button

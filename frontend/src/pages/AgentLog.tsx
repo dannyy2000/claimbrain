@@ -68,7 +68,7 @@ export default function AgentLog() {
       const res  = await fetch(rpc, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method: "eth_call", params: [{ to, data }, "latest"] }),
+        body:    JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }] }),
       });
       const json = await res.json();
       if (json.error) throw new Error(json.error.message);
