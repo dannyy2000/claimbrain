@@ -58,11 +58,13 @@ export default function AgentLog() {
       return;
     }
 
-    // Explicit network avoids ethers treating Somnia as "unknown" and attempting ENS lookups
-    const provider = new ethers.JsonRpcProvider(SOMNIA_TESTNET.rpcUrls[0], {
-      chainId: 50312,
-      name: "somnia-testnet",
-    });
+    // staticNetwork: true prevents ethers v6 from doing any ENS/network lookups on Somnia
+    const network  = new ethers.Network("somnia-testnet", 50312);
+    const provider = new ethers.JsonRpcProvider(
+      SOMNIA_TESTNET.rpcUrls[0],
+      network,
+      { staticNetwork: network }
+    );
     const registry = new ethers.Contract(ADDRESSES.CLAIM_REGISTRY, CLAIM_REGISTRY_ABI, provider);
 
     let lastTotal = 0n;
