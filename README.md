@@ -148,16 +148,19 @@ Nexus Mutual is the benchmark for onchain insurance. $500M+ in coverage. For a D
 │  (Called from inside handleTVLData callback)             │
 │                                                          │
 │  inferToolsChat() with onchainTools:                     │
-│    tool[0]: getRules(policyId)                           │
+│    tool[0]: getActiveRules(policyId)                     │
 │    tool[1]: getFraudHistory(claimant)                    │
 │    tool[2]: getCustomerTier(claimant)                    │
 │                                                          │
-│  LLM reasons:                                            │
-│    → calls getRules() → "TVL drop >80% = full cover"     │
-│    → calls getFraudHistory() → "0 previous claims, clean"│
-│    → calls getCustomerTier() → "standard tier"           │
-│    → chainOfThought logged: step-by-step reasoning       │
-│    → allowedValues: ["APPROVE","REJECT","FLAG_FRAUD"]    │
+│  LLM reasons (round 1 — tool_calls):                     │
+│    → calls getActiveRules() → rules as readable text     │
+│    → calls getFraudHistory() → "0 claims, not flagged"   │
+│    → calls getCustomerTier() → "standard"                │
+│                                                          │
+│  Contract executes tool calls via staticcall             │
+│  LLM reasons (round 2 — stop):                           │
+│    → chainOfThought: step-by-step decision trail         │
+│    → final word: APPROVE / REJECT / FLAG_FRAUD           │
 │                                                          │
 │  Validators reach consensus on LLM output               │
 │  → handleDecision() callback fires                       │
@@ -279,9 +282,11 @@ Method:   fetchString(url, dotNotationSelector) → string
 ID:       12847293847561029384
 Used for: Reasoning over Policy Brain rules, fraud detection, decision making
 Method:   inferToolsChat(roles, messages, mcpUrls, onchainTools, maxIterations, chainOfThought)
-Key args: onchainTools = [getRules, getFraudHistory, getCustomerTier]
+Key args: onchainTools = [getActiveRules, getFraudHistory, getCustomerTier]
           chainOfThought = true  (reasoning trail stored onchain)
-          allowedValues = ["APPROVE", "REJECT", "FLAG_FRAUD"]
+          Returns 6-tuple: (finishReason, finalResponse, updatedRoles, updatedMessages,
+                            pendingToolCallIds, pendingToolCalls)
+          Contract executes pendingToolCalls via staticcall, then fires second round
 ```
 
 ---
@@ -476,13 +481,13 @@ Rules update without redeployment. The LLM agent queries them live as onchain to
 ## Roadmap
 
 **Hackathon (3 weeks)**
-- [ ] PolicyBrain.sol — open rule storage contract
-- [ ] InsurancePool.sol — capital pool + payout execution
-- [ ] ClaimBrain.sol — multi-agent chain orchestrator
-- [ ] ClaimRegistry.sol — reasoning trail logger
-- [ ] DeFi Hack module — DeFiLlama + LLM chain
-- [ ] Flight Delay module — AviationStack + LLM chain
-- [ ] React frontend with ReasoningTrail viewer
+- [x] PolicyBrain.sol — open rule storage contract
+- [x] InsurancePool.sol — capital pool + payout execution
+- [x] ClaimBrain.sol — multi-agent chain orchestrator
+- [x] ClaimRegistry.sol — reasoning trail logger
+- [x] DeFi Hack module — DeFiLlama + LLM chain
+- [x] Flight Delay module — AviationStack + LLM chain
+- [x] React frontend with ReasoningTrail viewer
 - [ ] Deployed on Somnia mainnet
 
 **Post-Hackathon**
