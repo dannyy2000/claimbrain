@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0f1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d1f3c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#162032;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid lines -->
+  <g opacity="0.04" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accentGrad)"/>
+
+  <!-- Glow orb left -->
+  <ellipse cx="180" cy="315" rx="220" ry="220" fill="#3b82f6" opacity="0.04" filter="url(#softglow)"/>
+  <!-- Glow orb right -->
+  <ellipse cx="1020" cy="315" rx="200" ry="200" fill="#8b5cf6" opacity="0.04" filter="url(#softglow)"/>
+
+  <!-- ===== LEFT SECTION — branding ===== -->
+
+  <!-- Brain icon (stylised hexagon with circuit lines) -->
+  <g transform="translate(100, 180)" filter="url(#glow)">
+    <!-- Hexagon -->
+    <polygon points="55,0 110,31 110,95 55,126 0,95 0,31" fill="none" stroke="url(#accentGrad)" stroke-width="2.5" opacity="0.9"/>
+    <!-- Inner circuit lines -->
+    <line x1="55" y1="20" x2="55" y2="50" stroke="#3b82f6" stroke-width="1.5" opacity="0.7"/>
+    <line x1="55" y1="76" x2="55" y2="106" stroke="#8b5cf6" stroke-width="1.5" opacity="0.7"/>
+    <line x1="22" y1="38" x2="44" y2="63" stroke="#3b82f6" stroke-width="1.5" opacity="0.7"/>
+    <line x1="66" y1="63" x2="88" y2="38" stroke="#8b5cf6" stroke-width="1.5" opacity="0.7"/>
+    <line x1="22" y1="88" x2="44" y2="63" stroke="#3b82f6" stroke-width="1.5" opacity="0.7"/>
+    <line x1="66" y1="63" x2="88" y2="88" stroke="#8b5cf6" stroke-width="1.5" opacity="0.7"/>
+    <!-- Center dot -->
+    <circle cx="55" cy="63" r="8" fill="url(#accentGrad)" opacity="0.9"/>
+    <circle cx="55" cy="20" r="3.5" fill="#3b82f6" opacity="0.8"/>
+    <circle cx="55" cy="106" r="3.5" fill="#8b5cf6" opacity="0.8"/>
+    <circle cx="22" cy="38" r="3.5" fill="#3b82f6" opacity="0.8"/>
+    <circle cx="88" cy="38" r="3.5" fill="#8b5cf6" opacity="0.8"/>
+    <circle cx="22" cy="88" r="3.5" fill="#3b82f6" opacity="0.8"/>
+    <circle cx="88" cy="88" r="3.5" fill="#8b5cf6" opacity="0.8"/>
+  </g>
+
+  <!-- CLAIMBRAIN title -->
+  <text x="100" y="370" font-family="'Courier New', monospace" font-size="72" font-weight="bold" letter-spacing="4" fill="white" opacity="0.97">CLAIM</text>
+  <text x="100" y="452" font-family="'Courier New', monospace" font-size="72" font-weight="bold" letter-spacing="4" fill="url(#accentGrad)" filter="url(#glow)">BRAIN</text>
+
+  <!-- Tagline -->
+  <text x="100" y="502" font-family="'Courier New', monospace" font-size="18" fill="#94a3b8" letter-spacing="1">The onchain AI reasoning protocol for insurance.</text>
+
+  <!-- Chain badges -->
+  <rect x="100" y="530" width="130" height="30" rx="15" fill="#1e293b" stroke="#3b82f6" stroke-width="1" opacity="0.9"/>
+  <text x="165" y="549" font-family="'Courier New', monospace" font-size="13" fill="#3b82f6" text-anchor="middle" letter-spacing="1">SOMNIA L1</text>
+
+  <rect x="244" y="530" width="130" height="30" rx="15" fill="#1e293b" stroke="#8b5cf6" stroke-width="1" opacity="0.9"/>
+  <text x="309" y="549" font-family="'Courier New', monospace" font-size="13" fill="#8b5cf6" text-anchor="middle" letter-spacing="1">AI-NATIVE</text>
+
+  <rect x="388" y="530" width="150" height="30" rx="15" fill="#1e293b" stroke="#10b981" stroke-width="1" opacity="0.9"/>
+  <text x="463" y="549" font-family="'Courier New', monospace" font-size="13" fill="#10b981" text-anchor="middle" letter-spacing="1">ZERO HUMANS</text>
+
+  <!-- Divider -->
+  <line x1="620" y1="80" x2="620" y2="550" stroke="#1e3a5f" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- ===== RIGHT SECTION — agent pipeline ===== -->
+
+  <!-- Section label -->
+  <text x="660" y="115" font-family="'Courier New', monospace" font-size="13" fill="#475569" letter-spacing="3">AUTONOMOUS CLAIM FLOW</text>
+
+  <!-- Node 1: POLICY PURCHASED -->
+  <rect x="660" y="135" width="480" height="58" rx="8" fill="url(#cardGrad)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <rect x="660" y="135" width="4" height="58" rx="2" fill="#10b981"/>
+  <text x="682" y="160" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#10b981">01  POLICY PURCHASED</text>
+  <text x="682" y="180" font-family="'Courier New', monospace" font-size="11" fill="#475569">Coverage stored onchain. No further action needed.</text>
+
+  <!-- Arrow -->
+  <line x1="900" y1="193" x2="900" y2="215" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="895,215 905,215 900,224" fill="#475569"/>
+
+  <!-- Node 2: JSON API AGENT -->
+  <rect x="660" y="224" width="480" height="72" rx="8" fill="url(#cardGrad)" stroke="#3b82f6" stroke-width="1.5"/>
+  <rect x="660" y="224" width="4" height="72" rx="2" fill="#3b82f6"/>
+  <text x="682" y="249" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#3b82f6">02  JSON API REQUEST AGENT</text>
+  <text x="682" y="268" font-family="'Courier New', monospace" font-size="11" fill="#475569">fetchString(DeFiLlama / AviationStack)</text>
+  <text x="682" y="286" font-family="'Courier New', monospace" font-size="11" fill="#475569">Validators reach consensus on oracle data</text>
+
+  <!-- Arrow -->
+  <line x1="900" y1="296" x2="900" y2="318" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="895,318 905,318 900,327" fill="#3b82f6"/>
+
+  <!-- Node 3: LLM INFERENCE AGENT -->
+  <rect x="660" y="327" width="480" height="86" rx="8" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="2"/>
+  <rect x="660" y="327" width="4" height="86" rx="2" fill="#8b5cf6"/>
+  <text x="682" y="352" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#8b5cf6">03  LLM INFERENCE + ONCHAIN TOOLS</text>
+  <text x="682" y="371" font-family="'Courier New', monospace" font-size="11" fill="#475569">inferToolsChat → calls getActiveRules(), getFraudHistory()</text>
+  <text x="682" y="389" font-family="'Courier New', monospace" font-size="11" fill="#475569">Chain-of-thought reasoning stored permanently onchain</text>
+  <text x="682" y="406" font-family="'Courier New', monospace" font-size="11" fill="#8b5cf6">→ APPROVE / REJECT / FLAG_FRAUD</text>
+
+  <!-- Arrow -->
+  <line x1="900" y1="413" x2="900" y2="435" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="895,435 905,435 900,444" fill="#8b5cf6"/>
+
+  <!-- Node 4: PAYOUT -->
+  <rect x="660" y="444" width="480" height="58" rx="8" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5"/>
+  <rect x="660" y="444" width="4" height="58" rx="2" fill="#10b981"/>
+  <text x="682" y="469" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#10b981">04  PAYOUT EXECUTED</text>
+  <text x="682" y="489" font-family="'Courier New', monospace" font-size="11" fill="#475569">InsurancePool sends funds. ClaimRegistry logs decision.</text>
+
+  <!-- Built on Somnia badge bottom right -->
+  <text x="1140" y="620" font-family="'Courier New', monospace" font-size="12" fill="#1e3a5f" text-anchor="end" letter-spacing="1">BUILT ON SOMNIA AGENTATHON 2026</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="626" width="1200" height="4" fill="url(#accentGrad)"/>
+</svg>
